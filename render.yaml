@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: cube-server
+    env: python
+    buildCommand: ""
+    startCommand: gunicorn -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 app:app
+    envVars:
+      - key: FLASK_ENV
+        value: production
