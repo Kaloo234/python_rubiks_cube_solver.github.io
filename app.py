@@ -254,6 +254,6 @@ if __name__ == '__main__':
     ssl_context.load_cert_chain(certfile="cert.pem", keyfile="key.pem")
 
     try:
-        socketio.run(app, host="0.0.0.0", debug=True, port=5000, ssl_context=ssl_context)
+        socketio.run(app, host="0.0.0.0", debug=True, port=5000, ssl_context=ssl_context, allow_unsafe_werkzeug=True)
     except AssertionError:
         print("Une erreur d'écriture a été ignorée")
