@@ -1,3 +1,12 @@
+import numpy as np
+
+CUBE_SOLVED = np.array([[[0,0,0],[0,0,0],[0,0,0]],
+                        [[1,1,1],[1,1,1],[1,1,1]],
+                        [[2,2,2],[2,2,2],[2,2,2]],
+                        [[3,3,3],[3,3,3],[3,3,3]],
+                        [[4,4,4],[4,4,4],[4,4,4]],
+                        [[5,5,5],[5,5,5],[5,5,5]]])
+
 SIDES = {
     0: {"l": 1,"r": 3,"u": 4,"d": 2},
     1: {"l": 4,"r": 2,"u": 0,"d": 5},
@@ -162,4 +171,19 @@ OPPOSITE_MOVE = {
     "z":  "z'",
     "z2": "z2",
     "z'": "z",
+    }
+
+CANCEL_MOVES = {
+    0: {"cancel": ["U", "d'"], "result": "y"},
+    1: {"cancel": ["U'", "d"], "result": "y'"},
+    2: {"cancel": ["D", "u'"], "result": "y'"},
+    3: {"cancel": ["D'", "u"], "result": "y"},
+    2: {"cancel": ["R", "l'"], "result": "x"},
+    3: {"cancel": ["R'", "l"], "result": "x'"},
+    2: {"cancel": ["L", "r'"], "result": "x'"},
+    3: {"cancel": ["L'", "r"], "result": "x"},
+    2: {"cancel": ["F", "b'"], "result": "z"},
+    3: {"cancel": ["F'", "b"], "result": "z'"},
+    2: {"cancel": ["B", "f'"], "result": "z'"},
+    3: {"cancel": ["B'", "f"], "result": "z"},
     }

@@ -15,7 +15,7 @@
             
             text-align: center;
             margin: 0;
-            background-color: #d7d7d7;
+            background-color: white;
         }
         button {
             padding: 10px 20px;
@@ -32,8 +32,8 @@
         }
         .hole-cube {
             display: grid;
-            grid-template-columns: repeat(4, 160px);
-            grid-template-rows: repeat(3, 160px);
+            grid-template-columns: repeat(4, 166px);
+            grid-template-rows: repeat(3, 166px);
             gap: 5px;
         }
         .face {
@@ -41,11 +41,12 @@
             grid-template-columns: repeat(3, 50px);
             grid-template-rows: repeat(3, 50px);
             gap: 5px;
+            background-color: black;
+            border: 3px solid black;
         }
         .tile {
-            width: 48px;
-            height: 48px;
-            border: 1px solid #000;
+            width: 50px;
+            height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -54,6 +55,15 @@
         .tile:hover {
             outline: 4px solid var(--hover-color);
         }
+        .tile.UL { border-radius: 0px 0px 10px 0px; }
+        .tile.UC { border-radius: 0px 0px 10px 10px; }
+        .tile.UR { border-radius: 0px 0px 0px 10px; }
+        .tile.ML { border-radius: 0px 10px 10px 0px; }
+        .tile.MC { border-radius: 10px 10px 10px 10px; }
+        .tile.MR { border-radius: 10px 0px 0px 10px; }
+        .tile.DL { border-radius: 0px 10px 0px 0px; }
+        .tile.DC { border-radius: 10px 10px 0px 0px; }
+        .tile.DR { border-radius: 10px 0px 0px 0px; }
         .controls {
             position: relative;
             display: flex;
@@ -209,7 +219,11 @@
 
     <div>
         <input type="text", id="algo_bypass">
-        <button onclick="run_algo_bypass(document.getElementById('algo_bypass').value)"></button>
+        <button onclick="run_algo_bypass(document.getElementById('algo_bypass').value)">run algo</button>
+        <input type="text", id="save_cube">
+        <button onclick="save_cube(document.getElementById('save_cube').value)">save</button>
+        <input type="text", id="load_cube">
+        <button onclick="load_cube(document.getElementById('load_cube').value)">load</button>
     </div>
 
     <script>
@@ -238,6 +252,18 @@
             transports: ["websocket"]
         });
 
+        function save_cube(username) {
+            socket.emit('save_cube', {
+                username: username
+            })
+        }
+
+        function load_cube(username) {
+            socket.emit('load_cube', {
+                username: username
+            })
+        }
+
         function open_controls() {
             document.getElementById("controls-content").classList.toggle("show");
         }
@@ -248,7 +274,6 @@
                 document.getElementById("controls-content").classList.remove("show");
             }
         });
-
 
         function changeSelectedColor(newColor) {
             console.log(newColor, selectedColor)
@@ -289,6 +314,7 @@
         }
 
         function renderCube() {
+            const pos = ["UL","UC","UR","ML","MC","MR","DL","DC","DR"];
             const faceElement = document.getElementById("hole-cube");
             faceElement.innerHTML = '';
             faceElement.appendChild(document.createElement('div'));
@@ -301,7 +327,7 @@
             cube[0].forEach(row => {
                 row.forEach(color => {
                     const colorDiv = document.createElement('div');
-                    colorDiv.className = 'tile'
+                    colorDiv.className = 'tile ' + pos[i]
                     colorDiv.style.backgroundColor = colors[color];
                     colorDiv.id = i;
                     face0.appendChild(colorDiv);
@@ -321,7 +347,7 @@
                 cube[face].forEach(row => {
                     row.forEach(color => {
                         const colorDiv = document.createElement('div');
-                        colorDiv.className = 'tile'
+                        colorDiv.className = 'tile ' + pos[i]
                         colorDiv.style.backgroundColor = colors[color];
                         colorDiv.id = i
                         newFace.appendChild(colorDiv)
@@ -340,7 +366,7 @@
             cube[5].forEach(row => {
                 row.forEach(color => {
                     const colorDiv = document.createElement('div');
-                    colorDiv.className = 'tile'
+                    colorDiv.className = 'tile ' + pos[i]
                     colorDiv.style.backgroundColor = colors[color];
                     colorDiv.id = i;
                     face5.appendChild(colorDiv);
@@ -442,7 +468,6 @@
         });
 
         changeSelectedColor(0);
-        update_moves_list();
         renderCube();
 
     </script>

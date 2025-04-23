@@ -2,11 +2,12 @@ import numpy as np
 import tkinter as tk
 import time, random
 
-from refs import *
-from cases import *
-from cases_CFOP import *
+import refs
+import cases
+import cases_CFOP
 import user_data
-#from cube_fonctions_CFOP import *
+
+import traceback
 
 def set_visual(cube, root):
     if not root:
@@ -18,7 +19,7 @@ def set_visual(cube, root):
     for line in cube[0]:
         x=3
         for tile in line:
-            frame = tk.Frame(root, background=COLORS[tile], width=30, height=30)
+            frame = tk.Frame(root, background=refs.COLORS[tile], width=30, height=30)
             frame.grid(column=x,row=y)
             x += 1
         y +=1
@@ -29,7 +30,7 @@ def set_visual(cube, root):
             for line in cube[side_index]:
                 x = (side_index - 1) * 3
                 for tile in line:
-                    frame = tk.Frame(root, background=COLORS[tile], width=30, height=30)
+                    frame = tk.Frame(root, background=refs.COLORS[tile], width=30, height=30)
                     frame.grid(column=x,row=y)
                     x += 1
                 y += 1
@@ -38,7 +39,7 @@ def set_visual(cube, root):
     for line in cube[5]:
         x=3
         for tile in line:
-            frame = tk.Frame(root, background=COLORS[tile], width=30, height=30)
+            frame = tk.Frame(root, background=refs.COLORS[tile], width=30, height=30)
             frame.grid(column=x,row=y)
             x += 1
         y +=1
@@ -70,15 +71,15 @@ def get_side_arrays(cube, face_id):
             up_col_id = 2
             down_col_id = 0
             
-            up = np.array(cube[SIDES[face_id]["u"]][up_col_id])
-            down = np.array(cube[SIDES[face_id]["d"]][down_col_id])
+            up = np.array(cube[refs.SIDES[face_id]["u"]][up_col_id])
+            down = np.array(cube[refs.SIDES[face_id]["d"]][down_col_id])
             
         elif face_id == 4:
             up_col_id = 0
             down_col_id = 2
             
-            up = np.array(cube[SIDES[face_id]["u"]][up_col_id])
-            down = np.array(cube[SIDES[face_id]["d"]][down_col_id])
+            up = np.array(cube[refs.SIDES[face_id]["u"]][up_col_id])
+            down = np.array(cube[refs.SIDES[face_id]["d"]][down_col_id])
 
         elif face_id == 1:
             up = get_array_from_column(cube, face_id, "u")
@@ -94,10 +95,10 @@ def get_side_arrays(cube, face_id):
         elif face_id == 5:
             row_id = 2
             
-        left = np.array(cube[SIDES[face_id]["l"]][row_id])
-        right = np.array(cube[SIDES[face_id]["r"]][row_id])
-        up = np.array(cube[SIDES[face_id]["u"]][row_id])
-        down = np.array(cube[SIDES[face_id]["d"]][row_id])
+        left = np.array(cube[refs.SIDES[face_id]["l"]][row_id])
+        right = np.array(cube[refs.SIDES[face_id]["r"]][row_id])
+        up = np.array(cube[refs.SIDES[face_id]["u"]][row_id])
+        down = np.array(cube[refs.SIDES[face_id]["d"]][row_id])
 
     return left, right, up, down, up_col_id, down_col_id, row_id
 
@@ -127,19 +128,19 @@ def rotate_face_clockwise(cube, face_id, update_callback=None, sid=None, cube_st
         
     elif face_id == 0 or face_id == 5:
         #left
-        cube[SIDES[face_id]["l"]][row_id] = down
+        cube[refs.SIDES[face_id]["l"]][row_id] = down
         #right
-        cube[SIDES[face_id]["r"]][row_id] = up
+        cube[refs.SIDES[face_id]["r"]][row_id] = up
         #up
-        cube[SIDES[face_id]["u"]][row_id] = left
+        cube[refs.SIDES[face_id]["u"]][row_id] = left
         #down
-        cube[SIDES[face_id]["d"]][row_id] = right
+        cube[refs.SIDES[face_id]["d"]][row_id] = right
 
     if face_id == 2 or face_id == 4:
         #up
-        cube[SIDES[face_id]["u"]][up_col_id] = left
+        cube[refs.SIDES[face_id]["u"]][up_col_id] = left
         #down
-        cube[SIDES[face_id]["d"]][down_col_id] = right
+        cube[refs.SIDES[face_id]["d"]][down_col_id] = right
         
     elif face_id == 1 or face_id == 3:
         #up
@@ -180,19 +181,19 @@ def rotate_face_counterclockwise(cube, face_id, update_callback=None, sid=None, 
         
     elif face_id == 0 or face_id == 5:
         #left
-        cube[SIDES[face_id]["l"]][row_id] = up
+        cube[refs.SIDES[face_id]["l"]][row_id] = up
         #right
-        cube[SIDES[face_id]["r"]][row_id] = down
+        cube[refs.SIDES[face_id]["r"]][row_id] = down
         #up
-        cube[SIDES[face_id]["u"]][row_id] = right
+        cube[refs.SIDES[face_id]["u"]][row_id] = right
         #down
-        cube[SIDES[face_id]["d"]][row_id] = left
+        cube[refs.SIDES[face_id]["d"]][row_id] = left
 
     if face_id == 2 or face_id == 4:
         #up
-        cube[SIDES[face_id]["u"]][up_col_id] = right
+        cube[refs.SIDES[face_id]["u"]][up_col_id] = right
         #down
-        cube[SIDES[face_id]["d"]][down_col_id] = left
+        cube[refs.SIDES[face_id]["d"]][down_col_id] = left
         
     elif face_id == 1 or face_id == 3:
         #up
@@ -291,9 +292,9 @@ def get_col_id_from_side(face_id, side):
 def get_array_from_column(cube, face_id, side):
     col_id = get_col_id_from_side(face_id, side)
     
-    return np.array([cube[SIDES[face_id][side]][2][col_id],
-                     cube[SIDES[face_id][side]][1][col_id],
-                     cube[SIDES[face_id][side]][0][col_id]])
+    return np.array([cube[refs.SIDES[face_id][side]][2][col_id],
+                     cube[refs.SIDES[face_id][side]][1][col_id],
+                     cube[refs.SIDES[face_id][side]][0][col_id]])
 
 def get_array_from_middle_column(cube, face_id):
     return np.array([cube[face_id][0][1],
@@ -303,9 +304,9 @@ def get_array_from_middle_column(cube, face_id):
 def set_column_from_array(cube, face_id, side, array):
     col_id = get_col_id_from_side(face_id, side)
 
-    cube[SIDES[face_id][side]][0][col_id] = array[0]
-    cube[SIDES[face_id][side]][1][col_id] = array[1]
-    cube[SIDES[face_id][side]][2][col_id] = array[2]
+    cube[refs.SIDES[face_id][side]][0][col_id] = array[0]
+    cube[refs.SIDES[face_id][side]][1][col_id] = array[1]
+    cube[refs.SIDES[face_id][side]][2][col_id] = array[2]
 
 def set_middle_column_from_array(cube, face_id, array):
     cube[face_id][0][1] = array[0]
@@ -336,7 +337,7 @@ def run_algo(cube, algo, root=None, update_callback=None, sid=None, cube_states=
         #print(move)
         set_visual(cube, root)
         
-        move = MOVES[move]
+        move = refs.MOVES[move]
         for step in move:
             if step[0] == "tc":
                 rotate_face_clockwise(cube, step[1], update_callback, sid=sid, cube_states=cube_states)
@@ -355,7 +356,7 @@ def run_algo(cube, algo, root=None, update_callback=None, sid=None, cube_states=
 def get_random_algo(n):
     nb_moves = 18
     moves_list = []
-    moves = list(MOVES.keys())
+    moves = list(refs.MOVES.keys())
     while n > 0:
         new_move = moves[random.randint(0,nb_moves-1)]
         moves_list.append(new_move)
@@ -380,36 +381,38 @@ def solve_cube(cube, root=None, update_callback=None, sid=None, cube_states=None
 
     solve_OLL(cube, root, update_callback, sid, cube_states, append_moves)
 
-    solve_yellow_face_sides(cube, root, update_callback, sid, cube_states, append_moves)
+    #solve_yellow_face_sides(cube, root, update_callback, sid, cube_states, append_moves)
+
+    solve_PLL(cube, root, update_callback, sid, cube_states, append_moves)
 
     set_visual(cube, root)
     print("Solved!")
 
 def find_algo_white_cross(cube, side_color):
-    for possibility in WHITE_CROSS:
-        conditions = WHITE_CROSS[possibility]["conditions"]
+    for possibility in cases.WHITE_CROSS:
+        conditions = cases.WHITE_CROSS[possibility]["conditions"]
         if cube[conditions[0][0]][conditions[0][1]][conditions[0][2]] == 2:
             if cube[conditions[1][0]][conditions[1][1]][conditions[1][2]] == side_color:
-                return WHITE_CROSS[possibility]["algo"]
+                return cases.WHITE_CROSS[possibility]["algo"]
     print("White cross error")
     breakpoint()
 
 def find_algo_white_corner(cube, up_side_color, rt_side_color):
-    for possibility in WHITE_CORNERS:
-        conditions = WHITE_CORNERS[possibility]["conditions"]
+    for possibility in cases.WHITE_CORNERS:
+        conditions = cases.WHITE_CORNERS[possibility]["conditions"]
         if cube[conditions[0][0]][conditions[0][1]][conditions[0][2]] == 2:
             if (cube[conditions[1][0]][conditions[1][1]][conditions[1][2]] == up_side_color and
                 cube[conditions[2][0]][conditions[2][1]][conditions[2][2]] == rt_side_color):
-                return WHITE_CORNERS[possibility]["algo"]
+                return cases.WHITE_CORNERS[possibility]["algo"]
     print("White corner error")
     breakpoint()
 
 def find_algo_middle_layer(cube, up_side_color, rt_side_color):
-    for possibility in MIDDLE_LAYER:
-        conditions = MIDDLE_LAYER[possibility]["conditions"]
+    for possibility in cases.MIDDLE_LAYER:
+        conditions = cases.MIDDLE_LAYER[possibility]["conditions"]
         if cube[conditions[0][0]][conditions[0][1]][conditions[0][2]] == up_side_color:
             if cube[conditions[1][0]][conditions[1][1]][conditions[1][2]] == rt_side_color:
-                return MIDDLE_LAYER[possibility]["algo"]
+                return cases.MIDDLE_LAYER[possibility]["algo"]
     print("Middle layer error")
     breakpoint()
 
@@ -426,10 +429,10 @@ def find_algo_yellow_cross(cube):
                 if cube[4][line][value] == 4:
                     yellow_pos.append((4,line,value))
 
-    for possibility in YELLOW_CROSS:
-        conditions = YELLOW_CROSS[possibility]["conditions"]
+    for possibility in cases.YELLOW_CROSS:
+        conditions = cases.YELLOW_CROSS[possibility]["conditions"]
         if conditions == yellow_pos:
-            return YELLOW_CROSS[possibility]["algo"]
+            return cases.YELLOW_CROSS[possibility]["algo"]
     print("Yellow cross error")
     breakpoint()
 
@@ -441,10 +444,10 @@ def find_algo_yellow_face(cube):
                 if cube[side][line][value] == 4:
                     yellow_pos.append((side, line, value))
 
-    for possibility in YELLOW_FACE:
-        conditions = YELLOW_FACE[possibility]["conditions"]
+    for possibility in cases.YELLOW_FACE:
+        conditions = cases.YELLOW_FACE[possibility]["conditions"]
         if conditions == yellow_pos:
-            return YELLOW_FACE[possibility]["algo"], YELLOW_FACE[possibility]["algo_id"]
+            return cases.YELLOW_FACE[possibility]["algo"], cases.YELLOW_FACE[possibility]["algo_id"]
     print("Yellow face error")
     breakpoint()
 
@@ -472,19 +475,17 @@ def find_algo_yellow_sides(cube):
             elif cube[side][2][0] == cube[side][2][2] != cube[side][2][1]:
                 pairs_and_sides[0].append(side)
 
-    for possibility in YELLOW_FACE_SIDES:
-        conditions = YELLOW_FACE_SIDES[possibility]["conditions"]
+    for possibility in cases.YELLOW_FACE_SIDES:
+        conditions = cases.YELLOW_FACE_SIDES[possibility]["conditions"]
         if conditions == pairs_and_sides:
-            return YELLOW_FACE_SIDES[possibility]["algo"], YELLOW_FACE_SIDES[possibility]["algo_id"]
+            return cases.YELLOW_FACE_SIDES[possibility]["algo"], cases.YELLOW_FACE_SIDES[possibility]["algo_id"]
     print("Yellow face sides error")
     breakpoint()
     
 def solve_white_cross(cube, root, update_callback=None, sid=None, cube_states=None, append_moves=None):
     for side in [0,1,5,3]:
         algo = find_algo_white_cross(cube, side)
-        print(algo)
         run_algo(cube, algo, root, update_callback, sid, cube_states, append_moves)
-        print("F")
         run_algo(cube, "F", root, update_callback, sid, cube_states, append_moves)
 
 def solve_white_corners(cube, root, update_callback=None, sid=None, append_moves=None):
@@ -521,23 +522,17 @@ def solve_yellow_face_sides(cube, root, update_callback=None, sid=None, cube_sta
            not cube[3][0][2] == cube[3][1][2] == cube[3][2][2] or
            not cube[5][2][0] == cube[5][2][1] == cube[5][2][2]):
         algo, algo_id = find_algo_yellow_sides(cube)
-        print(algo)
         run_algo(cube, algo, root, update_callback, sid, cube_states, append_moves)
         if algo_id == 0:
-            print("R' U R' D2 R U' R' D2 R2")
             run_algo(cube, "R' U R' D2 R U' R' D2 R2", root, update_callback, sid, cube_states, append_moves)
         elif algo_id == 1:
-            print("R B' R B R B R B' R' B' R2")
             run_algo(cube, "R B' R B R B R B' R' B' R2", root, update_callback, sid, cube_states, append_moves)
 
     if cube[0][0][1] == 1:
-        print("B")
         run_algo(cube, "B", root, update_callback, sid, cube_states, append_moves)
     elif cube[0][0][1] == 5:
-        print("B2")
         run_algo(cube, "B2", root, update_callback, sid, cube_states, append_moves)
     elif cube[0][0][1] == 3:
-        print("B'")
         run_algo(cube, "B'", root, update_callback, sid, cube_states, append_moves)
 
 def list_to_array(_list):
@@ -547,7 +542,7 @@ def reduce_move_list_lenght(moves_list):
     simplified = []
     
     for move in moves_list:
-        if simplified and simplified[-1] == OPPOSITE_MOVE[move]:
+        if simplified and simplified[-1] == refs.OPPOSITE_MOVE[move]:
             simplified.pop()  # Annule les mouvements inverses
         elif len(simplified) > 1 and simplified[-2:] == [move, move]:
             simplified[-2:] = [move + "2"]  # Fusionne trois mouvements identiques
@@ -591,7 +586,7 @@ def shorten_moves_list(moves_list):
                     liste.pop(i+2)
                     liste.pop(i+1)
                     if len(liste[i]) == 1:
-                        liste[i] =+ "'"
+                        liste[i] += "'"
                     elif len(liste[i]) == 2:
                         if liste[i][1] == "'":
                             liste[i] = liste[i][0]
@@ -599,7 +594,7 @@ def shorten_moves_list(moves_list):
                     no_modif = False
                     liste.pop(i+1)
                     if len(liste[i]) == 1:
-                        liste[i] =+ "2"
+                        liste[i] += "2"
                     elif len(liste[i]) == 2:
                         if liste[i][0] == "'":
                             liste[i] = liste[i][0] + "2"
@@ -618,25 +613,39 @@ def shorten_moves_list(moves_list):
                     elif len(liste[i]) == 2 and len(liste[i+1]) == 1:
                         if liste[i][1] == "2":
                             liste.pop(i+1)
-                            liste[i][1] = "'"
+                            lst = list(liste.copy()[i])
+                            lst[1] = "'"
+                            liste[i] = "".join(lst)
                     elif len(liste[i]) == 2 and len(liste[i+1]) == 2:
-                        if liste[i][1] == "'" and liste[i+1][1] == "2":
+                        if ((liste[i][1] == "'" and liste[i+1][1] == "2") or
+                            (liste[i][1] == "2" and liste[i+1][1] == "'")):
                             liste.pop(i+1)
-                            liste[i][1] = ""
-                        elif liste[i][1] == "2" and liste[i+1][1] == "'":
-                            liste.pop(i+1)
-                            liste[i][1] = ""
+                            lst = list(liste.copy()[i])
+                            lst[1] = ""
+                            liste[i] = "".join(lst)
+                else:
+                    replacement = is_in_cancel_move(liste[i], liste[i+1])
+                    if replacement:
+                        liste.pop(i+1)
+                        liste[i] = replacement
                         
             except IndexError:
                 print("end of moves list")
                 break
-            except Exception as e:
-                print("erreur produite", e)
-    print("------------------------  liste",liste)
+            except Exception:
+                print("erreur produite")
+                traceback.print_exc()
+    #print("------------------------  liste",liste)
     return liste
 
+def is_in_cancel_move(move, move_plus_1):
+    for possibility in refs.CANCEL_MOVES:
+        canceling = refs.CANCEL_MOVES[possibility]["cancel"]
+        if move == canceling[0] and move_plus_1 == canceling[1]:
+            return refs.CANCEL_MOVES[possibility]["result"]
+
 def get_opposite_move(move):
-    return OPPOSITE_MOVE[move]
+    return refs.OPPOSITE_MOVE[move]
 
 
 
@@ -656,21 +665,20 @@ def get_opposite_move(move):
 
 
 def find_algo_F2L(cube, col_up, col_right):
-    for possibility in F2L:
-        conditions = F2L[possibility]["conditions"]
+    for possibility in cases_CFOP.F2L:
+        conditions = cases_CFOP.F2L[possibility]["conditions"]
         if cube[conditions[0][0][0]][conditions[0][0][1]][conditions[0][0][2]] == 2:
             if (cube[conditions[1][0][0]][conditions[1][0][1]][conditions[1][0][2]] == col_up and
                 cube[conditions[1][1][0]][conditions[1][1][1]][conditions[1][1][2]] == col_up):
                 if (cube[conditions[2][0][0]][conditions[2][0][1]][conditions[2][0][2]] == col_right and
                     cube[conditions[2][1][0]][conditions[2][1][1]][conditions[2][1][2]] == col_right):
                     #print(possibility)
-                    return F2L[possibility]["algo"]
+                    return cases_CFOP.F2L[possibility]["algo"]
     #print("F2L error")
     #breakpoint()
                 
 
 def solve_F2L(cube, root, update_callback=None, sid=None, cube_states=None, append_moves=None):
-    print("x'")
     run_algo(cube, "x'", root, update_callback, sid, cube_states, append_moves)
     countA = 0
     while (not np.array_equal(cube[5], np.array([[2,2,2],[2,2,2],[2,2,2]])) or
@@ -691,11 +699,9 @@ def solve_F2L(cube, root, update_callback=None, sid=None, cube_states=None, appe
                cube[3][1][0] != cube[3][1][1]):
             algo = find_algo_F2L(cube, cube[2][1][1], cube[3][1][1])
             if algo:
-                print(algo)
                 run_algo(cube, algo, root, update_callback, sid, cube_states, append_moves)
             else:
                 if count < 4:
-                    print("U")
                     run_algo(cube, "U", root, update_callback, sid, cube_states, append_moves)
                     count += 1
                 else:
@@ -706,23 +712,20 @@ def solve_F2L(cube, root, update_callback=None, sid=None, cube_states=None, appe
             # special case
             solve_F2L_supp(cube, root, update_callback, sid, cube_states, append_moves)
             countA = 0
-        print("d")
         run_algo(cube, "d", root, update_callback, sid, cube_states, append_moves)
-    print("x")
     run_algo(cube, "x", root, update_callback, sid, cube_states, append_moves)
 
 def solve_F2L_supp(cube, root, update_callback=None, sid=None, cube_states=None, append_moves=None):
     col_up = cube[2][1][1]
     col_right = cube[3][1][1]
-    for possibility in F2L_SUPP:
-        conditions = F2L_SUPP[possibility]["conditions"]
+    for possibility in cases_CFOP.F2L_SUPP:
+        conditions = cases_CFOP.F2L_SUPP[possibility]["conditions"]
         if len(conditions) == 2:
             if ((cube[conditions[0][0]][conditions[0][1]][conditions[0][2]] == col_up and
                  cube[conditions[1][0]][conditions[1][1]][conditions[1][2]] == col_right) or
                 (cube[conditions[0][0]][conditions[0][1]][conditions[0][2]] == col_right and
                  cube[conditions[1][0]][conditions[1][1]][conditions[1][2]] == col_up)):
-                algo = F2L_SUPP[possibility]["algo"]
-                print(algo)
+                algo = cases_CFOP.F2L_SUPP[possibility]["algo"]
                 run_algo(cube, algo, root, update_callback, sid, cube_states, append_moves)
                 return
                 
@@ -736,42 +739,95 @@ def solve_F2L_supp(cube, root, update_callback=None, sid=None, cube_states=None,
                 (cube[conditions[0][0]][conditions[0][1]][conditions[0][2]] == col_right and
                  cube[conditions[1][0]][conditions[1][1]][conditions[1][2]] == 2 and
                  cube[conditions[2][0]][conditions[2][1]][conditions[2][2]] == col_up)):
-                algo = F2L_SUPP[possibility]["algo"]
-                print(algo)
+                algo = cases_CFOP.F2L_SUPP[possibility]["algo"]
                 run_algo(cube, algo, root, update_callback, sid, cube_states, append_moves)
                 return
 
 
 def find_algo_OLL(cube):
-    for possibility in OLL:
+    for possibility in cases_CFOP.OLL:
         result = True
-        #print(possibility)
-        for condition in OLL[possibility]["conditions"]:
-            #print(cube[condition[0]][condition[1]][condition[2]])
+        for condition in cases_CFOP.OLL[possibility]["conditions"]:
             if cube[condition[0]][condition[1]][condition[2]] != 4: # 4 = yellow
                 result = False
                 break
         
         if result:
-            return OLL[possibility]["algo"]
+            return cases_CFOP.OLL[possibility]["algo"]
 
 def solve_OLL(cube, root, update_callback=None, sid=None, cube_states=None, append_moves=None):
-    print("start")
-    print("x'")
     run_algo(cube, "x'", root, update_callback, sid, cube_states, append_moves)
     count = 0
     while not np.array_equal(cube[0], np.array([[4,4,4],[4,4,4],[4,4,4]])):
         algo = find_algo_OLL(cube)
         if algo:
-            print(algo)
             run_algo(cube, algo, root, update_callback, sid, cube_states, append_moves)
         else:
             if count <= 5:
-                print("U")
                 run_algo(cube, "U", root, update_callback, sid, cube_states, append_moves)
-                #print("rotated :", count)
                 count += 1
             else:
                 breakpoint()
-    print("x")
+    run_algo(cube, "x", root, update_callback, sid, cube_states, append_moves)
+
+def find_algo_PLL(cube):
+    for possibility in cases_CFOP.PLL:
+        conditions = cases_CFOP.PLL[possibility]["conditions"]
+        result = True
+        used_pos = []
+        for condition in conditions:
+            if len(condition) == 2:
+                if not (cube[condition[0][0]][condition[0][1]][condition[0][2]] == cube[condition[1][0]][1][1] and
+                        cube[condition[1][0]][condition[1][1]][condition[1][2]] == cube[condition[0][0]][1][1]):
+                    result = False
+                    break
+                else:
+                    used_pos.extend(condition)
+            elif len(condition) == 3:
+                if not (cube[condition[0][0]][condition[0][1]][condition[0][2]] == cube[condition[1][0]][1][1] and
+                        cube[condition[1][0]][condition[1][1]][condition[1][2]] == cube[condition[2][0]][1][1] and
+                        cube[condition[2][0]][condition[2][1]][condition[2][2]] == cube[condition[0][0]][1][1]):
+                    result = False
+                    break
+                else:
+                    used_pos.extend(condition)
+                
+        if result:
+            result2 = True
+            valid_pos = [(1,0,0),(1,0,1),(1,0,2),(2,0,0),(2,0,1),(2,0,2),(3,0,0),(3,0,1),(3,0,2),(4,0,0),(4,0,1),(4,0,2)]
+            for pos in valid_pos:
+                if not pos in used_pos:
+                    if not cube[pos[0]][pos[1]][pos[2]] == cube[pos[0]][1][1]:
+                        result2 = False
+
+            if result2:
+                return cases_CFOP.PLL[possibility]["algo"]
+
+def solve_PLL(cube, root, update_callback=None, sid=None, cube_states=None, append_moves=None):
+    run_algo(cube, "x'", root, update_callback, sid, cube_states, append_moves)
+    count = 0
+    countB = 0
+    while not np.array_equal(cube, np.array([
+                                            [[4,4,4],[4,4,4],[4,4,4]],
+                                            [[1,1,1],[1,1,1],[1,1,1]],
+                                            [[0,0,0],[0,0,0],[0,0,0]],
+                                            [[3,3,3],[3,3,3],[3,3,3]],
+                                            [[5,5,5],[5,5,5],[5,5,5]],
+                                            [[2,2,2],[2,2,2],[2,2,2]]
+                                            ])):
+        algo = find_algo_PLL(cube)
+        if algo:
+            run_algo(cube, algo, root, update_callback, sid, cube_states, append_moves)
+        else:
+            if count < 4:
+                run_algo(cube, "U", root, update_callback, sid, cube_states, append_moves)
+                count += 1
+            else:
+                if countB < 4:
+                    count=0
+                    run_algo(cube, "d", root, update_callback, sid, cube_states, append_moves)
+                    countB += 1
+                else:
+                    breakpoint()
+                    break
     run_algo(cube, "x", root, update_callback, sid, cube_states, append_moves)
