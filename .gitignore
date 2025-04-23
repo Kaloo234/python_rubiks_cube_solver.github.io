@@ -1,4 +1,20 @@
+# Fichiers système macOS
+.DS_Store
+
+# Environnement Python
 __pycache__/
 *.pyc
-.vscode/
+*.pyo
+*.pyd
 env/
+venv/
+.env
+
+# Certificats SSL (si tu ne veux pas les pousser)
+cert.pem
+key.pem
+
+# Fichiers spécifiques à l'éditeur
+.vscode/
+.idea/
+*.swp
