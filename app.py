@@ -247,7 +247,7 @@ def send_moves_list_update(sid):
 
 def append_moves(move, sid):
     user_data.moves_lists[sid].append(move)
-
+'''
 if __name__ == '__main__':
     
     ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
@@ -257,3 +257,7 @@ if __name__ == '__main__':
         socketio.run(app, host="0.0.0.0", debug=True, port=5000, ssl_context=ssl_context, allow_unsafe_werkzeug=True)
     except AssertionError:
         print("Une erreur d'écriture a été ignorée")
+'''
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5000))
+    socketio.run(app, host="0.0.0.0", port=port)
